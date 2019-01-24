@@ -23,7 +23,7 @@ Render_World::~Render_World()
 Hit Render_World::Closest_Intersection(const Ray& ray)
 {
     Hit closest = {0,0,0};
-    closest.dist = 99999;
+    closest.dist = 9999999999999;
     for (unsigned i = 0; i < objects.size(); i++) {
         Hit temp = objects[i]->Intersection(ray, -1);
         if (temp.dist < closest.dist && temp.dist > small_t) {
@@ -63,10 +63,10 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
     // TODO
     vec3 color;
     Hit hit;
-    const Object* obj = Closest_Intersection(ray).object;
-    if (obj) {
-        vec3 intPt = ray.Point(hit.dist); 
-        color = obj->material_shader->Shade_Surface(ray, intPt, obj->Normal(intPt, -1), recursion_depth);
+    hit = Closest_Intersection(ray);
+    if (hit.object) {
+        vec3 intPt = ray.Point(hit.dist);
+        color = hit.object->material_shader->Shade_Surface(ray, intPt, hit.object->Normal(intPt, -1), recursion_depth);
     } else {
         vec3 none;
         color = background_shader->Shade_Surface(ray, none, none, recursion_depth);

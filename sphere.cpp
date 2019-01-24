@@ -17,7 +17,15 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
     } 
 
     float t1 = (-b - sqrt(d)) / (2 * a); //First t (t upon entry) except when d = 0
-    // float t2 = (-b + sqrt(d)) / (2 * a); //Second t (t upon exit) except when d = 0
+    float t2 = (-b + sqrt(d)) / (2 * a); //Second t (t upon exit) except when d = 0
+
+    if (t1 < 0) {
+        if (t2 > 0) {
+            t1 = t2;
+        } else {
+            return {0,0,0};
+        }
+    }
 
     Hit hit;
     if (d > 0) { //Two intersections, one entry, one exit
