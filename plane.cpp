@@ -19,6 +19,9 @@ Hit Plane::Intersection(const Ray& ray, int part) const
     	hit.object = this;
     	hit.part = part;
     	hit.dist = dot(normal, (x1 - ray.endpoint)) / dot(normal, ray.direction);
+      if (hit.dist < 0) {
+        return {0,0,0};
+      }
     	return hit;
     }
     return {0,0,0};
