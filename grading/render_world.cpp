@@ -61,6 +61,12 @@ void Render_World::Render()
 vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 {
     // TODO
+
+    if (recursion_depth > recursion_depth_limit) {
+        vec3 none;
+        return background_shader->Shade_Surface(ray, none, none, recursion_depth); //Return color
+    }
+
     vec3 color;
     Hit hit;
     hit = Closest_Intersection(ray);
