@@ -35,8 +35,8 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
     	color += (color_diffuse * lightColor * angle);
 
     	//Calculate specular
-    	vec3 reflection = lightDir.normalized() - (2 * dot(lightDir.normalized(), normal) * normal); //Calculate reflection vector
-    	angle = std::max(dot(ray.direction, reflection), 0.0);
+    	vec3 reflection = lightDir - (2 * dot(lightDir.normalized(), normal) * normal); //Calculate reflection vector
+    	angle = std::max(dot(ray.direction, reflection.normalized()), 0.0);
     	color += (color_specular * lightColor * pow(angle, specular_power));
     }
     return color;
