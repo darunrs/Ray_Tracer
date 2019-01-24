@@ -15,8 +15,9 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
 
     for(unsigned i = 0; i < world.lights.size(); i++) {
     	//Compute light direction
-    	lightRay.direction = (world.lights[i]->position - intersection_point).normalized(); //Points from object to light
+    	lightRay.direction = (world.lights[i]->position - intersection_point); //Points from object to light
     	double lightDist = lightRay.direction.magnitude_squared();
+    	lightRay.direction = lightRay.direction.normalized();
     	lightRay.endpoint = world.lights[i]->position;
 
     	//Check if object is in shadow
