@@ -115,7 +115,7 @@ bool Mesh::Intersect_Triangle(const Ray& ray, int tri, double& dist) const
         return false;
     }
     
-    dist = dot(w, q) * invDet; 
+    dist = (w, q) * invDet; 
     
     if (dist > small_t) {
         return true;

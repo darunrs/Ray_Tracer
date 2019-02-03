@@ -42,16 +42,39 @@ void Mesh::Read_Obj(const char* file)
 // Check for an intersection against the ray.  See the base class for details.
 Hit Mesh::Intersection(const Ray& ray, int part) const
 {
-    TODO;
-    return {};
+    // TODO;
+    double d = 0;
+    if (part < 0) {    
+    	for (size_t i = 0; i < triangles.size(); i++) {
+        	if (Intersect_Triangle(ray, i, d)) {
+            		Hit hit;
+            		hit.object = this;
+            		hit.dist = d;
+            		hit.part = i;
+            		return hit;
+        	}
+    	}
+    	return {0,0,0};
+    } else {
+        if (Intersect_Triangle(ray, part, d)) {
+            Hit hit;
+            hit.object = this;
+            hit.dist = d;
+            hit.part = part;
+            return hit;
+        }
+    	return {0,0,0};
+    }
 }
 
 // Compute the normal direction for the triangle with index part.
 vec3 Mesh::Normal(const vec3& point, int part) const
 {
     assert(part>=0);
-    TODO;
-    return vec3();
+    // TODO;
+    vec3 i = vertices[triangles[part][2]] - vertices[triangles[part][0]];
+    vec3 j = vertices[triangles[part][1]] - vertices[triangles[part][0]];
+    return cross(j, i).normalized();
 }
 
 // This is a helper routine whose purpose is to simplify the implementation
@@ -68,7 +91,35 @@ vec3 Mesh::Normal(const vec3& point, int part) const
 // two triangles.
 bool Mesh::Intersect_Triangle(const Ray& ray, int tri, double& dist) const
 {
-    TODO;
+    // TODO;
+    vec3 v = vertices[triangles[tri][1]] - vertices[triangles[tri][0]];
+    vec3 w = vertices[triangles[tri][2]] - vertices[triangles[tri][0]];
+    vec3 detP = cross(ray.direction, w);
+    double det = dot(v, detP);
+    
+    if (det < small_t && det > -small_t) {
+        return false;
+    }
+    
+    double invDet = 1 / det;
+    
+    vec3 y = ray.endpoint - vertices[triangles[tri][0]];
+    double w1 = dot(y, detP) * invDet; 
+    if (w1 <= -weight_tolerance || w1 > 1.00001) {
+        return false;
+    }
+    
+    vec3 q = cross(y, v);
+    double w2 = dot(ray.direction, q) * invDet; 
+    if (w2 <= -weight_tolerance || (w1+w2) > 1.00001) {
+        return false;
+    }
+    
+    dist = dot(w, q) * invDet; 
+    
+    if (dist > small_t) {
+        return true;
+    }
     return false;
 }
 

@@ -24,13 +24,21 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
 {
     Hit closest = {0,0,0};
     closest.dist = 9999999999999;
+    unsigned ind = -1;
     for (unsigned i = 0; i < objects.size(); i++) {
         Hit temp = objects[i]->Intersection(ray, -1);
+        if (debug_pixel && temp.part != 0) {
+		std::cout << "intersection with obj[" << i << "] part " << temp.part << "; dist = " << temp.dist << std::endl;
+	}
         if (temp.dist < closest.dist && temp.dist > small_t) {
+            ind = i;
             closest.object = objects[i];
-            closest.part = -1;
+            closest.part = temp.part;
             closest = temp;
         }
+    }
+    if (debug_pixel) {
+	std::cout << "closest intersection: obj[" << ind << "]; part = " << closest.part << "; dist = " << closest.dist << std::endl;
     }
     return closest;
 }
@@ -42,6 +50,16 @@ void Render_World::Render_Pixel(const ivec2& pixel_index)
     Ray ray;
     ray.endpoint = camera.position;
     ray.direction = (camera.World_Position(pixel_index) - camera.position).normalized();
+    if (debug_pixel) {
+        std::cout << "debug pixel: " << pixel_index[0] << " " << pixel_index[1] << std::endl;
+	std::cout << "cast ray: end = ";
+        for (int i = 0; i < 3; i++)
+            std::cout << ray.endpoint[i] << " ";     
+        std::cout << "; dir = ";
+        for (int i = 0; i < 3; i++)
+            std::cout << ray.direction[i] << " ";     
+        std::cout << std::endl;
+    }
     vec3 color=Cast_Ray(ray,1);
     camera.Set_Pixel(pixel_index,Pixel_Color(color));
 }
@@ -72,7 +90,10 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
     hit = Closest_Intersection(ray);
     if (hit.object) {
         vec3 intPt = ray.Point(hit.dist);
-        color = hit.object->material_shader->Shade_Surface(ray, intPt, hit.object->Normal(intPt, -1), recursion_depth);
+        if (debug_pixel) {
+	    std::cout << "call Shade_Surface with: location = " << intPt << "; normal = " << hit.object->Normal(intPt, hit.part) << std::endl;
+        }
+        color = hit.object->material_shader->Shade_Surface(ray, intPt, hit.object->Normal(intPt, hit.part), recursion_depth);
     } else {
         vec3 none;
         color = background_shader->Shade_Surface(ray, none, none, recursion_depth);
