@@ -42,16 +42,37 @@ void Mesh::Read_Obj(const char* file)
 // Check for an intersection against the ray.  See the base class for details.
 Hit Mesh::Intersection(const Ray& ray, int part) const
 {
-    TODO;
-    return {};
+    // TODO;
+    double d = 0;
+    size_t i, end;
+    if (part < 0) {
+        i = 0;
+        end = triangles.size();
+    } else {
+        i = part;
+        end = part + 1;
+    }
+
+    for (i = 0; i < end; i++) {
+        if (Intersect_Triangle(ray, i, d)) {
+            Hit hit;
+            hit.object = this;
+            hit.dist = d;
+            hit.part = i;
+            return hit;
+        }
+    }
+    return {0,0,0};
 }
 
 // Compute the normal direction for the triangle with index part.
 vec3 Mesh::Normal(const vec3& point, int part) const
 {
     assert(part>=0);
-    TODO;
-    return vec3();
+    // TODO;
+    vec3 i = triangles[part][2] - triangles[part][0];
+    vec3 j = triangles[part][1] - triangles[part][0];
+    return cross(i, j);
 }
 
 // This is a helper routine whose purpose is to simplify the implementation
@@ -68,7 +89,22 @@ vec3 Mesh::Normal(const vec3& point, int part) const
 // two triangles.
 bool Mesh::Intersect_Triangle(const Ray& ray, int tri, double& dist) const
 {
-    TODO;
+    // TODO;
+    vec3 y = ray.endpoint - triangles[i][0];
+    vec3 v = triangles[i][1] - triangles[i][0];
+    vec3 w = triangles[i][2] - triangles[i][0];
+    double den = dot(cross(ray.direction, v), w);
+
+    double alpha, beta, gamma, S;
+    beta = dot(cross(ray.direction, v), y) / den;
+    gamma = dot(cross(w, ray.direction), y) / den;
+    alpha = (1 - beta) - gamma;
+    S = dot(cross(v, w), y) / den;
+
+    if (S >= small_t && alpha >= -weight_tolerance && beta >= -weight_tolerance && gamma >= -weight_tolerance) {
+        dist = S;
+        return true;
+    }
     return false;
 }
 
