@@ -29,7 +29,7 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
         Hit temp = objects[i]->Intersection(ray, -1);
         if (debug_pixel) {
 		std::cout << "intersection with obj[" << i << "] part " << temp.part << "; dist = " << temp.dist << std::endl;
-        Box b = objects[i]->Bounding_Box(-1);
+        Box b = objects[i]->Bounding_Box(temp.part);
         if (b.Intersection(ray)) {
             std::cout << "box intersection too" << std::endl;
         }
