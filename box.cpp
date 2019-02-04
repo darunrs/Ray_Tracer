@@ -5,37 +5,36 @@
 bool Box::Intersection(const Ray& ray) const
 {
     // TODO;
-    ivec2 comp1, comp2;
-    vec3 invdir = 1 / ray.direction; //To prevent issues with dividing by 0
-    
-    double txlo = (lo[0] - ray.endpoint[0]) * invdir;
-    double txhi = (hi[0] - ray.endpoint[0]) * invdir;
-    comp1 = {txlo, txhi};
+    double tmin, tmax;
+    vec3 invdir;
+    for (size_t i = 0; i < 3; i++) {
+        invdir[i] = 1 / ray.direction[i]; //To prevent issues with dividing by 0
+    }
+    double txlo = (lo[0] - ray.endpoint[0]) * invdir[0];
+    double txhi = (hi[0] - ray.endpoint[0]) * invdir[0];
     if (txlo > txhi) {
-    	comp1 = {txhi, txlo};
+    	std::swap(txhi, txlo);
     } 
 
-    double tylo = (lo[1] - ray.endpoint[1]) * invdir;
-    double tyhi = (hi[1] - ray.endpoint[1]) * invdir;
-    comp2 = {tylo, tyhi};
-    if (tylo > tyhi) {
-    	comp2 = {tyhi, tylo};
+    double tylo = (lo[1] - ray.endpoint[1]) * invdir[1];
+    double tyhi = (hi[1] - ray.endpoint[1]) * invdir[1];
+    if (tylo > tyhi) {	
+    	std::swap(tyhi, tylo);
     }
 
-    if (comp1[0] > comp2[1] || comp1[1] < comp2[0]) {
+    if (txlo > tyhi || txhi < tylo) {
     	return false;
     }
-    comp1[0] = std::max(comp1[0], comp2[0]);
-    comp1[1] = std::min(comp1[1], comp2[1]);
+    tmin = std::max(txlo, tylo);
+    tmax = std::min(txhi, tyhi);
 
-    double tzlo = (lo[2] - ray.endpoint[2]) * invdir;
-    double tzhi = (hi[2] - ray.endpoint[2]) * invdir;
-    comp2 = {tzlo, tzhi};
-	if (tzlo > tzhi) {
-    	comp2 = {tzhi, tzlo};
+    double tzlo = (lo[2] - ray.endpoint[2]) * invdir[2];
+    double tzhi = (hi[2] - ray.endpoint[2]) * invdir[2];
+    if (tzlo > tzhi) {
+    	std::swap(tzhi, tzlo);
     }
 
-    if (comp1[0] > comp2[1] || comp1[1] < comp2[0]) {
+    if (tmin > tzhi || tmax < tzlo) {
     	return false;
     }
     return true;

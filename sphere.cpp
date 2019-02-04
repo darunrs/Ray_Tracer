@@ -55,7 +55,9 @@ Box Sphere::Bounding_Box(int part) const
 {
     Box box;
     // TODO; calculate bounding box
-    box.lo = center - radius;
-    box.hi = center + radius;
+    for (size_t i = 0; i < 3; i++) {
+        box.lo[i] = center[i] - radius;
+        box.hi[i] = center[i] + radius;
+    }
     return box;
 }
