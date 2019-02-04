@@ -27,8 +27,12 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
     unsigned ind = -1;
     for (unsigned i = 0; i < objects.size(); i++) {
         Hit temp = objects[i]->Intersection(ray, -1);
-        if (debug_pixel && temp.part != 0) {
+        if (debug_pixel) {
 		std::cout << "intersection with obj[" << i << "] part " << temp.part << "; dist = " << temp.dist << std::endl;
+        Box b = objects[i]->Bounding_Box(-1);
+        if (b.Intersection(ray)) {
+            std::cout << "box intersection too" << std::endl;
+        }
 	}
         if (temp.dist < closest.dist && temp.dist > small_t) {
             ind = i;
