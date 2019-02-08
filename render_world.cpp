@@ -28,12 +28,17 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
     for (unsigned i = 0; i < objects.size(); i++) {
         Hit temp = objects[i]->Intersection(ray, -1);
         if (debug_pixel) {
-		std::cout << "intersection with obj[" << i << "] part " << temp.part << "; dist = " << temp.dist << std::endl;
-        Box b = objects[i]->Bounding_Box(temp.part);
-        if (b.Intersection(ray)) {
-            std::cout << "box intersection too" << std::endl;
-        }
-	}
+    		std::cout << "intersection with obj[" << i << "] part " << temp.part << "; dist = " << temp.dist << std::endl;
+            vector<int> c;
+            hierarchy.Intersection_Candidates(ray, c);
+            if (c.size() == 0) {
+                std::cout << "no box intersections found" << std::endl;
+            } else if (hierarchy.entries[c[0]].obj == objects[i]) {
+                std::cout << "correct box intersection" << std::endl;
+            } else {
+                std::cout << "incorrect box intersection" << std::endl;
+            }
+	    }
         if (temp.dist < closest.dist && temp.dist > small_t) {
             ind = i;
             closest.object = objects[i];
@@ -109,7 +114,15 @@ void Render_World::Initialize_Hierarchy()
 {
     TODO; // Fill in hierarchy.entries; there should be one entry for
     // each part of each object.
-
+    for (size_t i = 0; i < objects.size(); i++) {
+        for (size_t j = 0; j < objects[i].number_parts; j++) {
+            Entry e;
+            e.obj = objects[i];
+            e.part = j;
+            e.box = objects[j].Bounding_Box(j);
+            hierarch.entries.push_back(e);
+        }
+    }
     hierarchy.Reorder_Entries();
     hierarchy.Build_Tree();
 }
