@@ -4,6 +4,9 @@
 // Determine if the ray intersects with the sphere
 Hit Sphere::Intersection(const Ray& ray, int part) const
 {
+    if (debug_pixel) {
+        std::cout << "Center: " << center << ", radius: " << radius << std::endl;
+    }
     // TODO
     vec3 v = ray.endpoint - center;
     float a = dot(ray.direction, ray.direction);

@@ -8,35 +8,28 @@ bool Box::Intersection(const Ray& ray) const
     double tmin, tmax;
     vec3 invdir;
     for (size_t i = 0; i < 3; i++) {
-        invdir[i] = 1 / ray.direction[i]; //To prevent issues with dividing by 0
+        invdir[i] = 1.0 / ray.direction[i]; //To prevent issues with dividing by 0
     }
     double txlo = (lo[0] - ray.endpoint[0]) * invdir[0];
     double txhi = (hi[0] - ray.endpoint[0]) * invdir[0];
-    if (txlo > txhi) {
-    	std::swap(txhi, txlo);
-    } 
 
     double tylo = (lo[1] - ray.endpoint[1]) * invdir[1];
     double tyhi = (hi[1] - ray.endpoint[1]) * invdir[1];
-    if (tylo > tyhi) {	
-    	std::swap(tyhi, tylo);
-    }
-
-    if (txlo > tyhi || txhi < tylo) {
-    	return false;
-    }
-    tmin = std::max(txlo, tylo);
-    tmax = std::min(txhi, tyhi);
-
+    
     double tzlo = (lo[2] - ray.endpoint[2]) * invdir[2];
     double tzhi = (hi[2] - ray.endpoint[2]) * invdir[2];
-    if (tzlo > tzhi) {
-    	std::swap(tzhi, tzlo);
-    }
+    
+    tmin = std::max(std::max(std::min(txlo, txhi), std::min(tylo, tyhi)), std::min(tzlo, tzhi));
+    tmax = std::min(std::min(std::max(txlo, txhi), std::max(tylo, tyhi)), std::max(tzlo, tzhi));
 
-    if (tmin > tzhi || tmax < tzlo) {
-    	return false;
+    if (tmax < 0.0001) { //if there is intersection but box is behind ray
+        return false;
     }
+    
+    if (tmin > (tmax + 0.0001)) { //ray does no intersect
+        return false;
+    }
+    
     return true;
 }
 

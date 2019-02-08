@@ -51,7 +51,7 @@ void Hierarchy::Build_Tree()
     while(parents < (int)entries.size()) {
     	parents *= 2;
     }
-    int p = ((2 * parents) - 1) - entries.size();
+    int p = ((2 * parents) - 1) - parents;
     
     if (p == 0) {
         tree.push_back(entries[0].box);
@@ -72,9 +72,23 @@ void Hierarchy::Build_Tree()
      }
      
     //Fill tree
-    for (int i = (int)(tree.size() - 1); i > 1; i=i-2) {
+    for (int i = ((2 * parents) - 2); i > 1; i=i-2) {
         int par = (i / 2) - 1;
-        tree[par] = tree[i].Union(tree[i-1]);
+        if (i >= (int)tree.size()) {
+            if (i == (int)tree.size()) {
+                tree[par] = tree[i-1];
+            }
+        } else {
+            if (tree[i].hi[0] != -99999) {
+                if (tree[i-1].hi[0] != -99999) {
+                    tree[par] = tree[i].Union(tree[i-1]);
+                } else {
+                    tree[par] = tree[i];
+                }
+            } else {
+                tree[par] = tree[i-1];
+            }
+        }
     } 
 }
 
@@ -91,6 +105,8 @@ void Hierarchy::Intersection_Candidates(const Ray& ray, std::vector<int>& candid
       int sz = (int)ind.size(); 
     	for (int j = 0; j < sz; j++) {
     		if (tree[ind[0]].Intersection(ray)) {
+            if (debug_pixel) 
+                std::cout << ind[0] << " intersects" << std::endl;
     				ind.push_back((2*ind[0]) + 1);
             ind.push_back((2*ind[0]) + 2);
    			}
@@ -101,6 +117,12 @@ void Hierarchy::Intersection_Candidates(const Ray& ray, std::vector<int>& candid
           return;
       }
       i = ind[0];
+      if (debug_pixel) {
+          for (unsigned i = 0; i < ind.size(); i++) {
+            std::cout << ind[i] << " ";
+          }
+          std::cout << std::endl;
+      }
     }
     if (ind.size() == 0) {
         candidates.clear();

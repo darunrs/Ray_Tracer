@@ -24,9 +24,31 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
 {
     Hit closest = {0,0,0};
     closest.dist = 9999999999999;
-    unsigned ind = -1;
+    //Hit hClosest = closest;
+    //unsigned ind = -1;
     std::vector<int> c;
     hierarchy.Intersection_Candidates(ray, c);
+    if (debug_pixel) {
+        std::cout << "candidates: ";
+        for (unsigned i = 0; i < c.size(); i++) {
+            std::cout << c[i] << " ";
+        }
+        std::cout << std::endl;
+        
+        /*std::cout << "ray: " << ray.endpoint << std::endl;
+        
+        std::cout << "entry boxes: ";
+        for (unsigned i = 0; i < hierarchy.entries.size(); i++) {
+            std::cout << "entry " << i << ": " << hierarchy.entries[i].box.lo << ", hi: " << hierarchy.entries[i].box.hi << std::endl;
+        }
+        std::cout << std::endl;
+        
+        for (unsigned i = 0; i < hierarchy.tree.size(); i++) {
+            std::cout << i << " lo: " << hierarchy.tree[i].lo << ", hi: " << hierarchy.tree[i].hi << std::endl;
+            if (hierarchy.tree[i].Intersection(ray))
+                std::cout << "box intersects" << std::endl;
+        }*/
+    }
     /*for (unsigned i = 0; i < objects.size(); i++) {
         Hit temp = objects[i]->Intersection(ray, -1);
         if (debug_pixel) {
@@ -40,15 +62,20 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
         }
     }*/
     for (unsigned i = 0; i < c.size(); i++) {
+        if (c[i] >= (int)hierarchy.entries.size())
+            continue;
         Hit temp = hierarchy.entries[c[i]].obj->Intersection(ray, hierarchy.entries[c[i]].part);
         if (temp.dist < closest.dist && temp.dist > small_t) {
-            ind = i;
+            //ind = c[i];
             closest = temp;
         }
     }
-    if (debug_pixel) {
+    /*if (debug_pixel) {
 	    std::cout << "closest intersection: entries[" << ind << "]; part = " << closest.part << "; dist = " << closest.dist << std::endl;
-    }
+         if (closest.object == hClosest.object) {
+             std::cout << "same closest found" << std::endl;
+         }
+    }*/
     return closest;
 }
 
