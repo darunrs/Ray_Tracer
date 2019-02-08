@@ -45,13 +45,13 @@ Box Box::Union(const Box& bb) const
 {
     Box box;
     // TODO;
-    box.lo[0] = std::min(lo[0], bb.lo[0]);
-    box.lo[1] = std::min(lo[1], bb.lo[1]);
-    box.lo[2] = std::min(lo[2], bb.lo[2]);
+    box.lo[0] = std::min(this->lo[0], bb.lo[0]);
+    box.lo[1] = std::min(this->lo[1], bb.lo[1]);
+    box.lo[2] = std::min(this->lo[2], bb.lo[2]);
 
-    box.hi[0] = std::max(lo[0], bb.lo[0]);
-    box.hi[1] = std::max(lo[1], bb.lo[1]);
-    box.hi[2] = std::max(lo[2], bb.lo[2]);
+    box.hi[0] = std::max(this->hi[0], bb.hi[0]);
+    box.hi[1] = std::max(this->hi[1], bb.hi[1]);
+    box.hi[2] = std::max(this->hi[2], bb.hi[2]);
     return box;
 }
 
