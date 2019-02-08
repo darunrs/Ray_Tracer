@@ -105,8 +105,6 @@ void Hierarchy::Intersection_Candidates(const Ray& ray, std::vector<int>& candid
       int sz = (int)ind.size(); 
     	for (int j = 0; j < sz; j++) {
     		if (tree[ind[0]].Intersection(ray)) {
-            if (debug_pixel) 
-                std::cout << ind[0] << " intersects" << std::endl;
     				ind.push_back((2*ind[0]) + 1);
             ind.push_back((2*ind[0]) + 2);
    			}
@@ -117,12 +115,6 @@ void Hierarchy::Intersection_Candidates(const Ray& ray, std::vector<int>& candid
           return;
       }
       i = ind[0];
-      if (debug_pixel) {
-          for (unsigned i = 0; i < ind.size(); i++) {
-            std::cout << ind[i] << " ";
-          }
-          std::cout << std::endl;
-      }
     }
     if (ind.size() == 0) {
         candidates.clear();

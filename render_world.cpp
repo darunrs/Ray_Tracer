@@ -24,31 +24,9 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
 {
     Hit closest = {0,0,0};
     closest.dist = 9999999999999;
-    //Hit hClosest = closest;
-    //unsigned ind = -1;
+    unsigned ind = -1;
     std::vector<int> c;
     hierarchy.Intersection_Candidates(ray, c);
-    if (debug_pixel) {
-        std::cout << "candidates: ";
-        for (unsigned i = 0; i < c.size(); i++) {
-            std::cout << c[i] << " ";
-        }
-        std::cout << std::endl;
-        
-        /*std::cout << "ray: " << ray.endpoint << std::endl;
-        
-        std::cout << "entry boxes: ";
-        for (unsigned i = 0; i < hierarchy.entries.size(); i++) {
-            std::cout << "entry " << i << ": " << hierarchy.entries[i].box.lo << ", hi: " << hierarchy.entries[i].box.hi << std::endl;
-        }
-        std::cout << std::endl;
-        
-        for (unsigned i = 0; i < hierarchy.tree.size(); i++) {
-            std::cout << i << " lo: " << hierarchy.tree[i].lo << ", hi: " << hierarchy.tree[i].hi << std::endl;
-            if (hierarchy.tree[i].Intersection(ray))
-                std::cout << "box intersects" << std::endl;
-        }*/
-    }
     /*for (unsigned i = 0; i < objects.size(); i++) {
         Hit temp = objects[i]->Intersection(ray, -1);
         if (debug_pixel) {
@@ -66,16 +44,13 @@ Hit Render_World::Closest_Intersection(const Ray& ray)
             continue;
         Hit temp = hierarchy.entries[c[i]].obj->Intersection(ray, hierarchy.entries[c[i]].part);
         if (temp.dist < closest.dist && temp.dist > small_t) {
-            //ind = c[i];
+            ind = c[i];
             closest = temp;
         }
     }
-    /*if (debug_pixel) {
+    if (debug_pixel) {
 	    std::cout << "closest intersection: entries[" << ind << "]; part = " << closest.part << "; dist = " << closest.dist << std::endl;
-         if (closest.object == hClosest.object) {
-             std::cout << "same closest found" << std::endl;
-         }
-    }*/
+    }
     return closest;
 }
 
@@ -86,16 +61,6 @@ void Render_World::Render_Pixel(const ivec2& pixel_index)
     Ray ray;
     ray.endpoint = camera.position;
     ray.direction = (camera.World_Position(pixel_index) - camera.position).normalized();
-    if (debug_pixel) {
-        //std::cout << "debug pixel: " << pixel_index[0] << " " << pixel_index[1] << std::endl;
-	//std::cout << "cast ray: end = ";
-        /*for (int i = 0; i < 3; i++)
-            std::cout << ray.endpoint[i] << " ";     
-        std::cout << "; dir = ";
-        for (int i = 0; i < 3; i++)
-            std::cout << ray.direction[i] << " ";     
-        std::cout << std::endl;*/
-    }
     vec3 color=Cast_Ray(ray,1);
     camera.Set_Pixel(pixel_index,Pixel_Color(color));
 }
@@ -126,9 +91,6 @@ vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
     hit = Closest_Intersection(ray);
     if (hit.object) {
         vec3 intPt = ray.Point(hit.dist);
-        if (debug_pixel) {
-	    //std::cout << "call Shade_Surface with: location = " << intPt << "; normal = " << hit.object->Normal(intPt, hit.part) << std::endl;
-        }
         color = hit.object->material_shader->Shade_Surface(ray, intPt, hit.object->Normal(intPt, hit.part), recursion_depth);
     } else {
         vec3 none;
